@@ -15,7 +15,6 @@ type Position = {
 
 const App: React.FC = () => {
   const [mousePos, setMousePos] = useState<Position>({ x: 0, y: 0 });
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Track mouse movement and touch interaction
@@ -23,23 +22,34 @@ const App: React.FC = () => {
     // Initial center position
     setMousePos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
 
+    const updatePos = (clientX: number, clientY: number) => {
+      setMousePos({ x: clientX, y: clientY });
+    };
+
     const handleMouseMove = (event: MouseEvent) => {
-      setMousePos({ x: event.clientX, y: event.clientY });
+      updatePos(event.clientX, event.clientY);
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      // Optional: Allow spotlight to follow touch on mobile if desired
+      if (event.touches.length > 0) {
+        updatePos(event.touches[0].clientX, event.touches[0].clientY);
+      }
     };
 
-    const checkTouch = () => {
-      setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length > 0) {
+        updatePos(event.touches[0].clientX, event.touches[0].clientY);
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    checkTouch();
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchstart', handleTouchStart);
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchstart', handleTouchStart);
     };
   }, []);
 
@@ -66,10 +76,8 @@ const App: React.FC = () => {
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-100 ease-out opacity-60"
         style={{ 
           backgroundImage: `url(${BG_IMAGE_URL})`,
-          // Disable movement on touch devices to prevent performance issues/dizziness
-          transform: isTouchDevice 
-            ? 'scale(1.05)' 
-            : `scale(1.05) translate(${(mousePos.x - window.innerWidth/2) / 60}px, ${(mousePos.y - window.innerHeight/2) / 60}px)`
+          // Enable parallax movement on all devices (mouse or touch)
+          transform: `scale(1.05) translate(${(mousePos.x - window.innerWidth/2) / 60}px, ${(mousePos.y - window.innerHeight/2) / 60}px)`
         }}
       />
 
@@ -77,9 +85,8 @@ const App: React.FC = () => {
       <div 
         className="fixed inset-0 z-10 pointer-events-none"
         style={{
-          background: isTouchDevice 
-            ? 'radial-gradient(circle at center, transparent 15%, rgba(2, 6, 23, 0.95) 80%)' 
-            : `radial-gradient(circle 400px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(2, 6, 23, 0.96) 100%)`
+          // Dynamic spotlight following cursor/touch on all devices
+          background: `radial-gradient(circle 400px at ${mousePos.x}px ${mousePos.y}px, transparent 0%, rgba(2, 6, 23, 0.96) 100%)`
         }}
       />
 
