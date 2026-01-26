@@ -16,6 +16,7 @@ type Position = {
 const App: React.FC = () => {
   const [mousePos, setMousePos] = useState<Position>({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isGlowing, setIsGlowing] = useState(false); // State for the periodic glow effect
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Handle Entrance Animation and Mouse Tracking
@@ -58,6 +59,16 @@ const App: React.FC = () => {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchstart', handleTouchStart);
     };
+  }, []);
+
+  // Periodic Glow Effect
+  useEffect(() => {
+    const glowInterval = setInterval(() => {
+      setIsGlowing(true);
+      setTimeout(() => setIsGlowing(false), 2000); // Glow lasts for 2 seconds
+    }, 8000); // Triggers every 8 seconds
+
+    return () => clearInterval(glowInterval);
   }, []);
 
   const openWhatsApp = () => {
@@ -165,21 +176,30 @@ const App: React.FC = () => {
              </h1>
           </div>
 
-          {/* CTA Button - Bottom Right of Hero Section */}
-          <div className="absolute bottom-6 right-4 md:bottom-12 md:right-12 z-30">
+          {/* CTA Button - FIXED Position to show ALWAYS - With Periodic Glow */}
+          <div className="fixed bottom-6 right-4 md:bottom-12 md:right-12 z-50">
              <div className="relative group">
-               {/* Ambient glow */}
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] md:w-[180px] md:h-[180px] bg-blue-500/5 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all duration-700"></div>
+               {/* Ambient glow - Pulses when isGlowing */}
+               <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-full blur-3xl transition-all duration-1000 
+                  ${isGlowing ? 'bg-cyan-500/30 scale-110' : 'bg-blue-500/5 group-hover:bg-cyan-500/20 scale-100'}`}>
+               </div>
                
                <button 
                 onClick={openWhatsApp}
-                className="relative flex flex-col items-center justify-center w-28 h-28 md:w-40 md:h-40 rounded-full bg-slate-900/60 border border-white/10 backdrop-blur-md text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] hover:scale-105 active:scale-95 transition-all duration-500 ease-out hover:bg-gradient-to-br hover:from-cyan-400 hover:to-blue-600 hover:border-transparent hover:shadow-[0_0_80px_rgba(6,182,212,0.5)] group-hover:text-white"
+                className={`relative flex flex-col items-center justify-center w-28 h-28 md:w-40 md:h-40 rounded-full bg-slate-900/60 backdrop-blur-md text-white transition-all duration-700 ease-in-out
+                  ${isGlowing 
+                    ? 'border-cyan-400/80 shadow-[0_0_100px_rgba(6,182,212,0.7)] scale-105' 
+                    : 'border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.6)]'
+                  }
+                  hover:scale-110 active:scale-95 hover:bg-gradient-to-br hover:from-cyan-400 hover:to-blue-600 hover:border-transparent hover:shadow-[0_0_80px_rgba(6,182,212,0.5)] group-hover:text-white
+                `}
                >
-                 <div className="absolute inset-0 rounded-full border border-white/5 scale-90 group-hover:scale-100 group-hover:border-white/20 transition-transform duration-500"></div>
+                 {/* Internal Ring Animation */}
+                 <div className={`absolute inset-0 rounded-full border border-white/5 transition-transform duration-500 ${isGlowing ? 'scale-100 border-white/30' : 'scale-90 group-hover:scale-100 group-hover:border-white/20'}`}></div>
                  
-                 <Calendar className="mb-1 md:mb-3 text-amber-200/80 group-hover:text-white transition-colors duration-300 w-6 h-6 md:w-8 md:h-8" strokeWidth={1.5} />
-                 <span className="font-serif italic text-base md:text-2xl text-amber-50/90 leading-none group-hover:text-white transition-colors duration-300">Agendar</span>
-                 <span className="text-[9px] md:text-xs uppercase tracking-[0.25em] text-amber-500/80 mt-1 font-bold group-hover:text-cyan-100 transition-colors duration-300">Cita</span>
+                 <Calendar className={`mb-1 md:mb-3 w-6 h-6 md:w-8 md:h-8 transition-colors duration-300 ${isGlowing ? 'text-cyan-200' : 'text-amber-200/80 group-hover:text-white'}`} strokeWidth={1.5} />
+                 <span className={`font-serif italic text-base md:text-2xl leading-none transition-colors duration-300 ${isGlowing ? 'text-white' : 'text-amber-50/90 group-hover:text-white'}`}>Agendar</span>
+                 <span className={`text-[9px] md:text-xs uppercase tracking-[0.25em] mt-1 font-bold transition-colors duration-300 ${isGlowing ? 'text-cyan-100' : 'text-amber-500/80 group-hover:text-cyan-100'}`}>Cita</span>
                </button>
              </div>
           </div>
