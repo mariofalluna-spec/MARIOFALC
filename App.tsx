@@ -131,24 +131,30 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        {/* Central Content Group: Phrase + Button - Fixed to viewport */}
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 flex flex-col items-center justify-center pointer-events-none w-full px-4">
-           
+        {/* Central Content: Phrase - Centered */}
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none w-full px-4 flex flex-col items-center justify-center">
            {/* The requested phrase */}
-           <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif italic text-center text-white/95 drop-shadow-[0_4px_10px_rgba(0,0,0,1)] mb-10 md:mb-14 leading-tight tracking-wide opacity-90">
+           <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif italic text-center text-white/95 drop-shadow-[0_4px_10px_rgba(0,0,0,1)] leading-tight tracking-wide opacity-90">
              Dale luz a tu sonrisa <br/>
              <span className="text-amber-100/90 not-italic font-light text-xl md:text-4xl mt-4 block tracking-[0.2em] uppercase text-shadow-gold">hoy mismo</span>
            </h1>
+        </div>
 
-           {/* Central Button - Colorful Explosion */}
-           <div className="relative group pointer-events-auto">
-             {/* Ambient glow - Cyan/Blue effect */}
+        {/* CTA Button - Position Logic:
+            - Unified Position: Fixed Bottom Right for BOTH Mobile and Desktop
+        */}
+        <div className="fixed z-50 pointer-events-auto transition-all duration-700 ease-in-out
+                        right-4 bottom-8
+                        md:right-12 md:bottom-12">
+           
+           <div className="relative group">
+             {/* Ambient glow */}
              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] md:w-[180px] h-[160px] md:h-[180px] bg-blue-500/5 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition-all duration-700"></div>
              
              <button 
               onClick={openWhatsApp}
               // Hover: Cyan -> Blue Gradient (No Purple)
-              className="relative flex flex-col items-center justify-center w-36 h-36 md:w-44 md:h-44 rounded-full bg-slate-900/60 border border-white/10 backdrop-blur-md text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] hover:scale-105 active:scale-95 transition-all duration-500 ease-out hover:bg-gradient-to-br hover:from-cyan-400 hover:to-blue-600 hover:border-transparent hover:shadow-[0_0_80px_rgba(6,182,212,0.5)] group-hover:text-white"
+              className="relative flex flex-col items-center justify-center w-36 h-36 md:w-40 md:h-40 rounded-full bg-slate-900/60 border border-white/10 backdrop-blur-md text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] hover:scale-105 active:scale-95 transition-all duration-500 ease-out hover:bg-gradient-to-br hover:from-cyan-400 hover:to-blue-600 hover:border-transparent hover:shadow-[0_0_80px_rgba(6,182,212,0.5)] group-hover:text-white"
              >
                <div className="absolute inset-0 rounded-full border border-white/5 scale-90 group-hover:scale-100 group-hover:border-white/20 transition-transform duration-500"></div>
                
