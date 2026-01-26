@@ -15,12 +15,18 @@ type Position = {
 
 const App: React.FC = () => {
   const [mousePos, setMousePos] = useState<Position>({ x: 0, y: 0 });
+  const [isLoaded, setIsLoaded] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Track mouse movement and touch interaction
+  // Handle Entrance Animation and Mouse Tracking
   useEffect(() => {
     // Initial center position
     setMousePos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+
+    // Trigger entrance animation
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 1200);
 
     const updatePos = (clientX: number, clientY: number) => {
       setMousePos({ x: clientX, y: clientY });
@@ -47,6 +53,7 @@ const App: React.FC = () => {
     window.addEventListener('touchstart', handleTouchStart);
     
     return () => {
+      clearTimeout(timer);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchstart', handleTouchStart);
@@ -71,6 +78,32 @@ const App: React.FC = () => {
       ref={containerRef}
       className="relative min-h-screen w-full overflow-x-hidden bg-slate-950 text-slate-200 selection:bg-cyan-500/30"
     >
+      {/* --- Entrance Animation Overlay (Mouth Opening Effect) --- */}
+      <div className={`fixed inset-0 z-[100] flex items-center justify-center transition-all duration-500 delay-[1400ms] ${isLoaded ? 'pointer-events-none opacity-0' : 'opacity-100'}`}>
+          
+          {/* Top Curtain */}
+          <div className={`absolute top-0 left-0 w-full h-[55%] bg-slate-950 z-20 transition-transform duration-[1800ms] ease-[cubic-bezier(0.76,0,0.24,1)] will-change-transform ${isLoaded ? '-translate-y-full' : 'translate-y-0'}`}>
+            {/* The Curve (Convex Down - Upper Lip) */}
+            <div className="absolute -bottom-[12vh] left-1/2 -translate-x-1/2 w-[140%] h-[24vh] bg-slate-950 rounded-[50%]"></div>
+          </div>
+
+          {/* Bottom Curtain */}
+          <div className={`absolute bottom-0 left-0 w-full h-[55%] bg-slate-950 z-20 transition-transform duration-[1800ms] ease-[cubic-bezier(0.76,0,0.24,1)] will-change-transform ${isLoaded ? 'translate-y-full' : 'translate-y-0'}`}>
+             {/* The Curve (Convex Up - Lower Lip) */}
+             <div className="absolute -top-[12vh] left-1/2 -translate-x-1/2 w-[140%] h-[24vh] bg-slate-950 rounded-[50%]"></div>
+          </div>
+
+          {/* Center Content (Logo/Smile) - Fades out as mouth opens */}
+          <div className={`relative z-30 flex flex-col items-center gap-6 transition-all duration-700 ease-out ${isLoaded ? 'opacity-0 scale-125 blur-sm' : 'opacity-100 scale-100'}`}>
+             <div className="relative">
+                <div className="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full animate-pulse"></div>
+                <img src={LOGO_URL} alt="Loading" className="relative w-24 h-24 rounded-full border border-white/10 shadow-[0_0_40px_rgba(6,182,212,0.2)]" />
+             </div>
+             {/* Smile Shape */}
+             <div className="w-24 h-12 border-b-4 border-cyan-400/80 rounded-[100%] shadow-[0_4px_20px_rgba(6,182,212,0.4)] animate-bounce-slight"></div>
+          </div>
+       </div>
+
       {/* --- Background Image Layer --- */}
       <div 
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-100 ease-out opacity-60"
@@ -131,8 +164,8 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        {/* Central Content: Phrase - Centered */}
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none w-full px-4 flex flex-col items-center justify-center">
+        {/* Central Content: Phrase - Centered in Container (Absolute instead of Fixed) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 pointer-events-none w-full px-4 flex flex-col items-center justify-center">
            {/* The requested phrase */}
            <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif italic text-center text-white/95 drop-shadow-[0_4px_10px_rgba(0,0,0,1)] leading-tight tracking-wide opacity-90">
              Dale luz a tu sonrisa <br/>
@@ -141,9 +174,10 @@ const App: React.FC = () => {
         </div>
 
         {/* CTA Button - Position Logic:
-            - Unified Position: Fixed Bottom Right for BOTH Mobile and Desktop
+            - Absolute: Stays within the layout container (does not float on scroll)
+            - Bottom Right relative to the container
         */}
-        <div className="fixed z-50 pointer-events-auto transition-all duration-700 ease-in-out
+        <div className="absolute z-50 pointer-events-auto transition-all duration-700 ease-in-out
                         right-4 bottom-8
                         md:right-12 md:bottom-12">
            
